@@ -1,0 +1,161 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: id-manage-postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - id-manage-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: id-manage-keycloak
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      # Fixed public URL so tokens always have iss=http://localhost:8080/realms/*
+      # regardless of whether the caller is a browser (localhost:8080) or another
+      # container (keycloak:8080). Required for the SSO demo app's OIDC flow.
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_BACKCHANNEL: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - id-manage-net
+
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    container_name: id-manage-fastapi
+    environment:
+      KC_SERVER_URL: http://keycloak:8080/
+      KC_ADMIN_USERNAME: admin
+      KC_ADMIN_PASSWORD: admin
+      KC_REALM: demo
+      KC_USER_REALM: master
+      KC_ADMIN_CLIENT_ID: admin-cli
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi/app:/app/app
+    networks:
+      - id-manage-net
+    depends_on:
+      - keycloak
+
+  nextjs:
+    build:
+      context: ./nextjs
+      dockerfile: Dockerfile
+    container_name: id-manage-nextjs
+    environment:
+      API_BASE_URL: http://fastapi:8000
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nextjs:/app
+      - nextjs_node_modules:/app/node_modules
+      - nextjs_build_cache:/app/.next
+    networks:
+      - id-manage-net
+    depends_on:
+      - fastapi
+
+  sso-demo:
+    build:
+      context: ./sso-demo
+      dockerfile: Dockerfile
+    container_name: id-manage-sso-demo
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      AUTH_SECRET: "local-dev-secret-please-change-in-production"
+      AUTH_URL: http://localhost:3001
+      AUTH_TRUST_HOST: "true"
+      KEYCLOAK_CLIENT_ID: sso-demo
+      KEYCLOAK_CLIENT_SECRET: sso-demo-secret-please-change
+      # Browser-facing issuer (for the login redirect and iss validation)
+      KEYCLOAK_ISSUER: http://localhost:8080/realms/demo
+      # Container-to-container URL (for code/token exchange, userinfo, jwks)
+      KEYCLOAK_INTERNAL_ISSUER: http://keycloak:8080/realms/demo
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./sso-demo:/app
+      - sso_demo_node_modules:/app/node_modules
+      - sso_demo_build_cache:/app/.next
+    networks:
+      - id-manage-net
+    depends_on:
+      - keycloak
+
+  sso-demo-b:
+    build:
+      context: ./sso-demo-b
+      dockerfile: Dockerfile
+    container_name: id-manage-sso-demo-b
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      # Distinct AUTH_SECRET — the session cookie for app B is unrelated
+      # to app A's. They only share the Keycloak SSO cookie.
+      AUTH_SECRET: "local-dev-secret-b-please-change-in-production"
+      AUTH_URL: http://localhost:3002
+      AUTH_TRUST_HOST: "true"
+      KEYCLOAK_CLIENT_ID: sso-demo-b
+      KEYCLOAK_CLIENT_SECRET: sso-demo-b-secret-please-change
+      KEYCLOAK_ISSUER: http://localhost:8080/realms/demo
+      KEYCLOAK_INTERNAL_ISSUER: http://keycloak:8080/realms/demo
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./sso-demo-b:/app
+      - sso_demo_b_node_modules:/app/node_modules
+      - sso_demo_b_build_cache:/app/.next
+    networks:
+      - id-manage-net
+    depends_on:
+      - keycloak
+
+networks:
+  id-manage-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  nextjs_node_modules:
+  nextjs_build_cache:
+  sso_demo_node_modules:
+  sso_demo_build_cache:
+  sso_demo_b_node_modules:
+  sso_demo_b_build_cache:

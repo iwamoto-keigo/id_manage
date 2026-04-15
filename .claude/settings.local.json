@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(curl -sf http://localhost:8000/health)",
+      "Bash(curl -s http://localhost:8000/health)",
+      "Bash(curl -sf -o /dev/null -w \"%{http_code}\" http://localhost:8080/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/realms/master)",
+      "Bash(curl -s http://localhost:8080/realms/demo)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/realms/demo/.well-known/openid-configuration)",
+      "Bash(curl -s -X POST http://localhost:8080/realms/master/protocol/openid-connect/token -H \"Content-Type: application/x-www-form-urlencoded\" -d \"username=admin&password=admin&grant_type=password&client_id=admin-cli\")",
+      "Bash(python -c \"import sys, json; d=json.loads\\(sys.stdin.read\\(\\)\\); print\\('token_type:', d.get\\('token_type'\\)\\); print\\('expires_in:', d.get\\('expires_in'\\)\\); print\\('access_token prefix:', d.get\\('access_token',''\\)[:40]+'...'\\)\")",
+      "Bash(curl -sf -o /dev/null -w \"%{http_code}\" http://localhost:8080/realms/demo)",
+      "Bash(curl -s http://localhost:8000/api/users)",
+      "Bash(python -c \"import sys, json; d=json.load\\(sys.stdin\\); print\\(f'count={len\\(d\\)}'\\); [print\\(u['username'], u['id'][:8]\\) for u in d]\")",
+      "Bash(curl -s http://localhost:8000/api/roles)",
+      "Bash(python -c \"import sys, json; d=json.load\\(sys.stdin\\); print\\([r['name'] for r in d if not r['name'].startswith\\('default-'\\) and 'offline' not in r['name']]\\)\")",
+      "Bash(curl -sf -o /dev/null http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/users)",
+      "Bash(curl -s http://localhost:3000/events)",
+      "Bash(curl -s http://localhost:8080/realms/demo/.well-known/openid-configuration)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('issuer:', d['issuer']\\); print\\('auth:', d['authorization_endpoint']\\); print\\('token:', d['token_endpoint']\\)\" echo \"\" echo \"[container via keycloak:8080]\" docker compose exec sso-demo wget -qO- http://keycloak:8080/realms/demo/.well-known/openid-configuration)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('issuer:', d['issuer']\\); print\\('auth:', d['authorization_endpoint']\\); print\\('token:', d['token_endpoint']\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); c=d[0] if d else None; print\\('clientId:', c['clientId']\\); print\\('publicClient:', c['publicClient']\\); print\\('redirectUris:', c['redirectUris']\\); print\\('enabled:', c['enabled']\\)\")",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"GET /users -> %{http_code}\\\\n\" http://localhost:3000/users)",
+      "Bash(curl -s -o /tmp/kc_login.html -w 'HTTP %{http_code}, size=%{size_download}\\\\n' 'http://localhost:8080/realms/demo/protocol/openid-connect/auth?scope=openid+profile+email&response_type=code&client_id=sso-demo&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fauth%2Fcallback%2Fkeycloak&code_challenge=xL5JKTr1v_WoYM9nvoXNwATEnvAadkhUYOT1fX3vk8s&code_challenge_method=S256')",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3002/)"
+    ]
+  }
+}

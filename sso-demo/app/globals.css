@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-paper text-ink;
+    background-image: radial-gradient(
+      ellipse 120% 80% at 20% 0%,
+      hsl(45 40% 97% / 0.7),
+      transparent 60%
+    );
+  }
+  ::selection {
+    background-color: hsl(12 50% 36% / 0.2);
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.3em] text-muted;
+  }
+}

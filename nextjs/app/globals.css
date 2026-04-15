@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Archival / editorial palette */
+    --paper: 40 33% 94%;
+    --ink: 35 13% 10%;
+    --rule: 36 22% 80%;
+    --sienna: 12 50% 36%;
+    --forest: 165 34% 24%;
+
+    /* shadcn tokens mapped to archival theme */
+    --background: 40 33% 94%;
+    --foreground: 35 13% 10%;
+    --card: 45 40% 97%;
+    --card-foreground: 35 13% 10%;
+    --popover: 45 40% 97%;
+    --popover-foreground: 35 13% 10%;
+    --primary: 12 50% 36%;
+    --primary-foreground: 45 40% 97%;
+    --secondary: 40 18% 88%;
+    --secondary-foreground: 35 13% 10%;
+    --muted: 40 20% 90%;
+    --muted-foreground: 35 8% 38%;
+    --accent: 165 34% 24%;
+    --accent-foreground: 45 40% 97%;
+    --destructive: 5 55% 30%;
+    --destructive-foreground: 45 40% 97%;
+    --border: 36 22% 80%;
+    --input: 36 22% 80%;
+    --ring: 35 13% 10%;
+    --radius: 0.125rem;
+  }
+}
+
+@layer base {
+  html {
+    /* Custom selection tone */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-paper text-ink;
+    font-feature-settings:
+      "ss01" on,
+      "cv11" on;
+    background-image:
+      radial-gradient(
+        ellipse 120% 80% at 20% 0%,
+        hsl(45 40% 97% / 0.7),
+        transparent 60%
+      ),
+      /* faint paper grain */
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.095 0 0 0 0 0.08 0 0 0 0.035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  ::selection {
+    background-color: hsl(var(--sienna) / 0.25);
+    color: hsl(var(--ink));
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--rule));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground;
+  }
+
+  .rule-hr {
+    @apply h-px w-full origin-left bg-rule;
+  }
+
+  .stat-numeral {
+    @apply font-display text-[88px] leading-[0.9] tracking-[-0.04em] text-ink;
+    font-feature-settings: "lnum", "tnum", "ss01";
+  }
+
+  /* Decorative vertical tick row used beneath section headings */
+  .tick-row {
+    background-image: linear-gradient(
+      to right,
+      hsl(var(--rule)) 0,
+      hsl(var(--rule)) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+    background-size: 12px 100%;
+    background-repeat: repeat-x;
+  }
+}
