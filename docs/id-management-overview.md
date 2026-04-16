@@ -346,6 +346,251 @@ flowchart TB
 - **管理コンソール**: Keycloak自体にWebベースの管理画面が組み込まれており、ブラウザからユーザー・レルム・クライアント等を操作可能
 - **最新バージョン**: v26系（2025〜2026年リリース）。MCP（Model Context Protocol）対応やワークフロー自動化機能などが追加されている
 
+### Keycloak の基本概念 ― レルム・クライアント・ロール
+
+Keycloakを使ううえで最初に理解すべき概念が **レルム（Realm）** です。
+
+**レルムとは、Keycloak内の独立した管理空間（テナント）** のことです。1つのKeycloakサーバーの中に複数のレルムを作成でき、レルムごとにユーザー・ロール・SSO設定・認証ポリシーがすべて独立しています。
+
+```mermaid
+flowchart TB
+    subgraph KC["Keycloak（1つのサーバー）"]
+        direction TB
+        subgraph Master["master レルム（管理用）"]
+            MAdmin["スーパー管理者"]
+        end
+
+        subgraph RealmA["company-a レルム（A社用）"]
+            direction TB
+            UsersA["ユーザー:<br>田中, 佐藤, 鈴木"]
+            RolesA["ロール:<br>admin, sales, hr"]
+            ClientsA["SSO連携:<br>楽楽精算, Salesforce"]
+            PolicyA["認証: パスワード＋MFA"]
+        end
+
+        subgraph RealmB["company-b レルム（B社用）"]
+            direction TB
+            UsersB["ユーザー:<br>山田, 高橋"]
+            RolesB["ロール:<br>admin, engineer"]
+            ClientsB["SSO連携:<br>Slack, AWS"]
+            PolicyB["認証: パスワードのみ"]
+        end
+    end
+
+    style KC fill:#fefce8,stroke:#eab308,color:#854d0e
+    style Master fill:#fee2e2,stroke:#ef4444,color:#991b1b
+    style RealmA fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style RealmB fill:#dcfce7,stroke:#22c55e,color:#166534
+    style MAdmin fill:#fee2e2,stroke:#ef4444,color:#991b1b
+    style UsersA fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style RolesA fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style ClientsA fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style PolicyA fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style UsersB fill:#dcfce7,stroke:#22c55e,color:#166534
+    style RolesB fill:#dcfce7,stroke:#22c55e,color:#166534
+    style ClientsB fill:#dcfce7,stroke:#22c55e,color:#166534
+    style PolicyB fill:#dcfce7,stroke:#22c55e,color:#166534
+```
+
+A社のユーザーからはB社のユーザーやSSO設定は一切見えません。完全に独立した世界です。
+
+**レルムの主な用途：**
+
+| 用途 | 説明 | 例 |
+|---|---|---|
+| マルチテナント | 複数の会社を1つのKeycloakで管理 | SaaS提供者が顧客ごとにレルムを分ける |
+| 環境分離 | 本番・検証・開発を安全に分離 | production レルムと staging レルム |
+| 単一テナント | 自社専用として利用 | master以外に1つのレルムを作成 |
+
+**master レルムは特別な存在** です。Keycloakをインストールすると最初から存在し、Keycloak全体を管理するスーパー管理者が所属します。実際のユーザーやSSO設定はmasterレルムには入れず、別のレルム（例: `demo`）を作成してそこに入れるのがベストプラクティスです。
+
+**クライアント** とは、Keycloakにおける「SSO連携先のアプリケーション」の呼び名です。レルムの中にクライアントを登録することで、そのアプリへのSSO連携が有効になります。
+
+**プロトタイプでのレルム構成：**
+
+```mermaid
+flowchart TB
+    subgraph Demo["demo レルム"]
+        direction TB
+        subgraph Users["ユーザー"]
+            U1["tanaka<br>（営業部）"]
+            U2["suzuki<br>（人事部）"]
+            U3["admin<br>（管理者）"]
+        end
+
+        subgraph Roles["ロール"]
+            R1["sales-app-access<br>営業アプリ利用可"]
+            R2["hr-app-access<br>人事アプリ利用可"]
+            R3["admin<br>全権限"]
+        end
+
+        subgraph Clients["クライアント（SSO連携先）"]
+            C1["sample-app-1<br>サンプルアプリ①"]
+            C2["sample-app-2<br>サンプルアプリ②"]
+        end
+
+        subgraph Auth["認証設定"]
+            A1["パスワードポリシー"]
+            A2["セッション有効期限"]
+        end
+    end
+
+    U1 -.-> R1
+    U2 -.-> R2
+    U3 -.-> R3
+
+    style Demo fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style Users fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style Roles fill:#fce7f3,stroke:#ec4899,color:#9d174d
+    style Clients fill:#e2e8f0,stroke:#64748b,color:#1e293b
+    style Auth fill:#fefce8,stroke:#eab308,color:#854d0e
+    style U1 fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style U2 fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style U3 fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style R1 fill:#fce7f3,stroke:#ec4899,color:#9d174d
+    style R2 fill:#fce7f3,stroke:#ec4899,color:#9d174d
+    style R3 fill:#fce7f3,stroke:#ec4899,color:#9d174d
+    style C1 fill:#e2e8f0,stroke:#64748b,color:#1e293b
+    style C2 fill:#e2e8f0,stroke:#64748b,color:#1e293b
+    style A1 fill:#fefce8,stroke:#eab308,color:#854d0e
+    style A2 fill:#fefce8,stroke:#eab308,color:#854d0e
+```
+
+デモでは、tanaka に `sales-app-access` ロールを付与して sample-app-1 にはログインできるが sample-app-2 にはアクセスできない、といった権限制御を見せることができます。
+
+### Keycloak管理コンソール vs 自作アプリの使い分け
+
+Keycloakには最初からWebベースの管理コンソールが備わっていますが、すべてをそこで行うわけではありません。**「何を管理するか」によって、管理コンソールと自作アプリを使い分ける**のが一般的です。
+
+#### Keycloak管理コンソールで行うこと
+
+**インフラ・基盤寄りの設定**は管理コンソールが主流です。これらは最初に一回設定したら頻繁に変更しないものです。
+
+- レルムの作成・設定
+- クライアント（SSO連携先アプリ）の登録・SAML/OIDC設定
+- 認証フロー（MFA必須にするか等）の設定
+- セッションポリシー（有効期限等）
+- IdP連携（AD/LDAP連携の設定）
+- ロールの定義
+
+#### ユーザー管理のパターン
+
+ユーザーの作成・削除・ロール付与といった日常的な操作は、**会社の規模と運用体制**によって3つのパターンに分かれます。
+
+```mermaid
+flowchart TB
+    subgraph P1["パターン1: 管理コンソールをそのまま使う"]
+        direction TB
+        P1_Who["IT管理者が直接操作"]
+        P1_Scale["小〜中規模向け"]
+        P1_Pro["✅ 追加開発不要"]
+        P1_Con["⚠️ 画面が複雑"]
+    end
+
+    subgraph P2["パターン2: 自作の管理画面"]
+        direction TB
+        P2_Who["人事・総務・部門管理者が操作"]
+        P2_Scale["中〜大規模向け"]
+        P2_Pro["✅ 業務に最適化した UI"]
+        P2_Con["⚠️ 開発コストがかかる"]
+    end
+
+    subgraph P3["パターン3: 外部システム連携"]
+        direction TB
+        P3_Who["人事システムから自動連携"]
+        P3_Scale["エンタープライズ向け"]
+        P3_Pro["✅ 完全自動化"]
+        P3_Con["⚠️ 構成が複雑"]
+    end
+
+    style P1 fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style P2 fill:#dcfce7,stroke:#22c55e,color:#166534
+    style P3 fill:#fefce8,stroke:#eab308,color:#854d0e
+    style P1_Who fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style P1_Scale fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style P1_Pro fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style P1_Con fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+    style P2_Who fill:#dcfce7,stroke:#22c55e,color:#166534
+    style P2_Scale fill:#dcfce7,stroke:#22c55e,color:#166534
+    style P2_Pro fill:#dcfce7,stroke:#22c55e,color:#166534
+    style P2_Con fill:#dcfce7,stroke:#22c55e,color:#166534
+    style P3_Who fill:#fefce8,stroke:#eab308,color:#854d0e
+    style P3_Scale fill:#fefce8,stroke:#eab308,color:#854d0e
+    style P3_Pro fill:#fefce8,stroke:#eab308,color:#854d0e
+    style P3_Con fill:#fefce8,stroke:#eab308,color:#854d0e
+```
+
+**パターン1: Keycloak管理コンソールをそのまま使う（小〜中規模）**
+
+Keycloakの管理コンソールにはユーザーの作成・削除・ロール付与・セッション管理が最初から備わっているので、IT管理者が直接操作する分にはこれで十分です。追加開発が不要なため、最もコストが低い選択肢です。
+
+**パターン2: 自作の管理画面を作る（中〜大規模）** ← 今回のプロトタイプ
+
+Keycloak Admin REST API を経由して、自社に最適化した管理画面を構築します。自作する主な理由は以下のとおりです。
+
+- Keycloakの管理コンソールは **IT管理者向けで、画面が複雑すぎる** — 人事部門や総務部門が触るには敷居が高い
+- **承認フローを入れたい** — 「上長が承認したらアカウント作成」のような業務フロー
+- **権限の全体像を可視化したい** — 誰がどのシステムにアクセスできるかを一覧表示
+- **監査ログをわかりやすく表示したい** — いつ誰が何をしたかをフィルタ・検索できるUI
+
+```mermaid
+flowchart LR
+    subgraph Custom["自作管理画面（Next.js）"]
+        direction TB
+        UL["ユーザー一覧<br>作成・編集・無効化"]
+        RM["ロール管理<br>ワンクリックで付与"]
+        Matrix["権限マトリクス<br>誰が何にアクセスできるか"]
+        Log["監査ログ<br>検索・フィルタ・エクスポート"]
+    end
+
+    API["FastAPI"] --> KC_API["Keycloak<br>Admin REST API"]
+    Custom --> API
+
+    style Custom fill:#dcfce7,stroke:#22c55e,color:#166534
+    style UL fill:#dcfce7,stroke:#22c55e,color:#166534
+    style RM fill:#dcfce7,stroke:#22c55e,color:#166534
+    style Matrix fill:#dcfce7,stroke:#22c55e,color:#166534
+    style Log fill:#dcfce7,stroke:#22c55e,color:#166534
+    style API fill:#10b981,stroke:#059669,color:#fff
+    style KC_API fill:#ef4444,stroke:#dc2626,color:#fff
+```
+
+**パターン3: 外部システム連携（エンタープライズ）**
+
+大企業では、人事システム（SAP、COMPANY等）と連携して「入社データが登録されたら自動でKeycloakにユーザー作成、退職したら自動削除」とする構成もあります。Keycloakの SCIM（System for Cross-domain Identity Management）対応やカスタムプロバイダーを使って実現します。
+
+#### 機能別の比較
+
+| 機能 | Keycloak管理コンソール | 自作アプリ（API経由） |
+|---|---|---|
+| 使う人 | IT管理者・エンジニア | 人事・総務・部門管理者 |
+| レルム設定 | ✅ ここでやる | ─ |
+| クライアント登録 | ✅ ここでやる | ─ |
+| 認証フロー設定 | ✅ ここでやる | ─ |
+| ユーザー作成・削除 | ✅ できる | ✅ こちらの方が使いやすい |
+| ロール付与 | ✅ できる | ✅ こちらの方が使いやすい |
+| 権限の一覧表示 | △ 見にくい | ✅ 自由にカスタマイズ可能 |
+| 承認フロー | ❌ 機能なし | ✅ 自作で実装 |
+| 監査ログ表示 | △ 見にくい | ✅ わかりやすく表示 |
+
+#### デモでの見せ方
+
+この使い分けは、**自作アプリの価値を見せる最大のポイント**です。
+
+```
+STEP 1: Keycloakの管理コンソールを見せる
+  → 「Keycloakの標準管理画面でもユーザー管理はできますが…」
+  → 画面が複雑で、ITに詳しくないと操作しにくいことを実感してもらう
+
+STEP 2: 自作の管理画面を見せる
+  → 「こちらが当社が開発した管理画面です」
+  → ユーザー一覧、ロール付与、有効/無効切り替えがワンクリック
+  → 権限マトリクス（誰がどのアプリにアクセスできるか）が一目瞭然
+  → 「管理画面はお客様の運用に合わせてカスタマイズ可能です」
+```
+
+**「Keycloakを裏で使いつつ、管理画面は自社の運用に最適化する」** — これが今回のプロトタイプの核心的な訴求ポイントです。
+
 ---
 
 ## 7. 国内SaaSとのSSO連携（楽楽シリーズの例）
@@ -726,7 +971,8 @@ flowchart TB
 - **5つの機能層**（ライフサイクル・認証・SSO・認可・監査）で構成される
 - **AD** はオンプレWindows環境では強力だが、SaaS連携には **Entra ID** などクラウド側の仕組みが必要
 - **自前構築** は、コスト削減・独自システム連携・管理画面カスタマイズなどのニーズがある場合に有効
-- **Keycloak** はOSSのIdP基盤として、SSO・MFA・ユーザー管理・RBAC・監査ログを備え、REST APIで全機能を外部から操作可能
+- **Keycloak** はOSSのIdP基盤として、SSO・MFA・ユーザー管理・RBAC・監査ログを備え、REST APIで全機能を外部から操作可能。**レルム**（独立した管理空間）単位で設定を分離でき、マルチテナントや環境分離に対応
+- **Keycloakの管理コンソール** は基盤設定（レルム・クライアント・認証フロー）に使い、**日常のユーザー管理は自作アプリ**（Admin REST API経由）で最適化するのが中〜大規模での主流
 - **楽楽精算をはじめとする国内SaaS** の多くはSAML 2.0に対応しており、Keycloakからの SSO 連携が可能
 - **SSOの体験** は「一度IdPにログインすればセッションが維持され、他のシステムにも再ログインなしでアクセスできる」こと。IdP起点・SP起点の2パターンがある
 - **SSOの内部動作** では、IdP側とSP側で別々のセッションが存在し、SAMLアサーション（電子署名付きXML）によって認証情報が安全に受け渡される

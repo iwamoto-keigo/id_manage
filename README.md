@@ -2,7 +2,7 @@
 
 Keycloak + FastAPI を使ったID管理デモアプリです。
 
-> 📐 システム構成・SSOの仕組み・シーケンス図は [`ARCHITECTURE.md`](./ARCHITECTURE.md) を参照してください。
+> 📐 システム構成・SSOの仕組み・シーケンス図は [`ARCHITECTURE.md`](./docs/ARCHITECTURE.md) を参照してください。
 
 ## 構成
 
