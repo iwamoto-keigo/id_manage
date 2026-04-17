@@ -24,10 +24,11 @@ id_manage/
 ├── README.md
 ├── .gitignore
 ├── docs/
-│   └── ARCHITECTURE.md          # アーキテクチャ解説（Mermaidシーケンス図付き）
+│   ├── ARCHITECTURE.md           # アーキテクチャ解説（Mermaidシーケンス図付き）
+│   └── id-management-overview.md # ID管理に関する解説（Mermaidシーケンス図付き）
 ├── keycloak/
 │   └── import/
-│       └── realm-export.json    # demoレルム定義（起動時に自動import）
+│       └── realm-export.json     # demoレルム定義（起動時に自動import）
 ├── fastapi/
 │   ├── Dockerfile
 │   ├── requirements.txt
@@ -35,8 +36,8 @@ id_manage/
 │   ├── app/
 │   │   ├── __init__.py
 │   │   ├── main.py
-│   │   ├── config.py            # pydantic-settings (KC_* 環境変数)
-│   │   ├── keycloak_client.py   # KeycloakAdmin dependency
+│   │   ├── config.py             # pydantic-settings (KC_* 環境変数)
+│   │   ├── keycloak_client.py    # KeycloakAdmin dependency
 │   │   ├── schemas.py
 │   │   └── routers/
 │   │       ├── users.py
@@ -50,38 +51,38 @@ id_manage/
 │       ├── test_roles.py
 │       ├── test_sessions.py
 │       └── test_events.py
-├── nextjs/                      # 管理ダッシュボード (:3000)
+├── nextjs/                       # 管理ダッシュボード (:3000)
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── tailwind.config.ts
 │   ├── app/
-│   │   ├── layout.tsx           # Fraunces + Manrope + JetBrains Mono
+│   │   ├── layout.tsx            # Fraunces + Manrope + JetBrains Mono
 │   │   ├── globals.css
-│   │   ├── page.tsx             # ダッシュボード
+│   │   ├── page.tsx              # ダッシュボード
 │   │   ├── users/
 │   │   │   ├── page.tsx
-│   │   │   ├── actions.ts       # Server Actions
+│   │   │   ├── actions.ts        # Server Actions
 │   │   │   ├── create-user-dialog.tsx
 │   │   │   └── user-row-actions.tsx
 │   │   └── events/page.tsx
 │   ├── components/
 │   │   ├── site-nav.tsx
-│   │   └── ui/                  # shadcn/ui (button, card, dialog, table, ...)
+│   │   └── ui/                   # shadcn/ui (button, card, dialog, table, ...)
 │   └── lib/
-│       ├── api.ts               # server-only FastAPI クライアント
+│       ├── api.ts                # server-only FastAPI クライアント
 │       ├── types.ts
 │       └── utils.ts
-├── sso-demo/                    # SSOサンプルアプリ A (:3001)
+├── sso-demo/                     # SSOサンプルアプリ A (:3001)
 │   ├── Dockerfile
 │   ├── package.json
-│   ├── auth.ts                  # next-auth v5 + Keycloak OIDC 設定
+│   ├── auth.ts                   # next-auth v5 + Keycloak OIDC 設定
 │   ├── app/
 │   │   ├── layout.tsx
-│   │   ├── page.tsx             # ログイン / ユーザー情報 / ログアウト
+│   │   ├── page.tsx              # ログイン / ユーザー情報 / ログアウト
 │   │   ├── globals.css
 │   │   └── api/auth/[...nextauth]/route.ts
 │   └── lib/utils.ts
-└── sso-demo-b/                  # SSOサンプルアプリ B (:3002)
+└── sso-demo-b/                   # SSOサンプルアプリ B (:3002)
     ├── Dockerfile
     ├── package.json
     ├── auth.ts

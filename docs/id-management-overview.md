@@ -294,9 +294,9 @@ quadrantChart
     x-axis "低コスト" --> "高コスト"
     y-axis "カスタマイズ性 低" --> "カスタマイズ性 高"
     quadrant-1 "高機能・高コスト"
-    quadrant-2 "柔軟だがコスト高"
+    quadrant-2 "柔軟かつ低コスト"
     quadrant-3 "手軽だが制約あり"
-    quadrant-4 "バランス型"
+    quadrant-4 "割高・制約あり"
     Keycloak: [0.25, 0.82]
     Entra ID P2: [0.78, 0.55]
     Okta: [0.85, 0.60]
