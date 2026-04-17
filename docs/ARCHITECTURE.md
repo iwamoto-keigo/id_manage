@@ -42,7 +42,8 @@ AppA と AppB は **別のクライアント**ですが、**同じ `demo` レル
 | **Keycloak** | IDプロバイダ（ユーザー・レルム・ロール・セッション・OIDC発行元） | Keycloak 最新版（Quarkus） |
 | **FastAPI** | Keycloak Admin REST API のラッパー。管理UIから呼ぶ業務APIを薄く整理 | Python / `python-keycloak` / `pydantic-settings` |
 | **Next.js 管理ダッシュボード** | 管理者向けUI。ユーザーCRUD、ロール割り当て、セッション/イベント閲覧 | App Router / Server Components / Server Actions / shadcn/ui |
-| **Next.js SSOサンプルアプリ** | 「Keycloakで認証されたユーザー」を体験するデモクライアント | next-auth v5 / Keycloakプロバイダ |
+| **Next.js SSOサンプルアプリ A** (`:3001`) | デモクライアント A（sienna アクセント、client: `sso-demo`） | next-auth v5 / Keycloak OIDC |
+| **Next.js SSOサンプルアプリ B** (`:3002`) | デモクライアント B（forest アクセント、client: `sso-demo-b`）。Aと同じレルムを共有しSSOクロスログインを体験 | next-auth v5 / Keycloak OIDC |
 
 この構成の特徴は、**「管理機能のフロー」と「SSO認証のフロー」が完全に別経路** である点です。
 
@@ -293,7 +294,8 @@ sequenceDiagram
 | --- | --- | --- |
 | Keycloak admin パスワード | `admin / admin` | 強固なパスワード + MFA |
 | `sso-demo` クライアント secret | `sso-demo-secret-please-change` | 環境変数/シークレットマネージャ経由 |
-| `AUTH_SECRET` (next-auth) | 固定文字列 | ランダム生成して環境変数で注入 |
+| `sso-demo-b` クライアント secret | `sso-demo-b-secret-please-change` | 同上 |
+| `AUTH_SECRET` (next-auth) | 固定文字列（A/B で別の値を使用） | ランダム生成して環境変数で注入 |
 | Keycloakの公開URL | `http://localhost:8080` (HTTP) | HTTPS + 正式なドメイン + `KC_HOSTNAME` を本番URLに |
 | `sslRequired` (demoレルム) | `external` | `all` （内部含め全てHTTPS必須） |
 | ブルートフォース保護 | 有効 (既定) | 引き続き有効、加えてWAF/レート制限 |
