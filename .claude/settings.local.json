@@ -29,7 +29,12 @@
       "Bash(curl -s -o /dev/null -w \"GET /users -> %{http_code}\\\\n\" http://localhost:3000/users)",
       "Bash(curl -s -o /tmp/kc_login.html -w 'HTTP %{http_code}, size=%{size_download}\\\\n' 'http://localhost:8080/realms/demo/protocol/openid-connect/auth?scope=openid+profile+email&response_type=code&client_id=sso-demo&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fapi%2Fauth%2Fcallback%2Fkeycloak&code_challenge=xL5JKTr1v_WoYM9nvoXNwATEnvAadkhUYOT1fX3vk8s&code_challenge_method=S256')",
       "Read(//tmp/**)",
-      "Bash(curl -s http://localhost:3002/)"
+      "Bash(curl -s http://localhost:3002/)",
+      "Bash(python -c \"import json; d=json.load\\(open\\('keycloak/import/realm-export.json'\\)\\); print\\('realm:', d['realm']\\); print\\('displayName:', d['displayName']\\); print\\('loginTheme:', d.get\\('loginTheme'\\)\\)\")",
+      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('docker-compose.yml'\\)\\)\")",
+      "Bash(python -c \"import json; d=json.load\\(open\\('keycloak/import/realm-export.json', encoding='utf-8'\\)\\); print\\('realm:', d['realm']\\); print\\('displayName:', d['displayName']\\); print\\('loginTheme:', d.get\\('loginTheme'\\)\\); print\\('clients:', [c['clientId'] for c in d['clients']]\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(find keycloak/themes -type f)"
     ]
   }
 }

@@ -41,6 +41,8 @@ services:
       - "8080:8080"
     volumes:
       - ./keycloak/import:/opt/keycloak/data/import:ro
+      # Custom login theme (paper-tone business look, matches admin UI)
+      - ./keycloak/themes/business-demo:/opt/keycloak/themes/business-demo:ro
     depends_on:
       postgres:
         condition: service_healthy

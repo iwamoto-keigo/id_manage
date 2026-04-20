@@ -39,7 +39,7 @@ AppA と AppB は **別のクライアント**ですが、**同じ `demo` レル
 | コンポーネント | 役割 | 主要技術 |
 | --- | --- | --- |
 | **PostgreSQL** | KeycloakのデータストアDB | `postgres:16-alpine` |
-| **Keycloak** | IDプロバイダ（ユーザー・レルム・ロール・セッション・OIDC発行元） | Keycloak 最新版（Quarkus） |
+| **Keycloak** | IDプロバイダ（ユーザー・レルム・ロール・セッション・OIDC発行元）。ログイン画面は `business-demo` カスタムテーマで紙トーンのビジネス寄りUIに揃えている | Keycloak 最新版（Quarkus） + カスタム login theme (`keycloak.v2` 継承) |
 | **FastAPI** | Keycloak Admin REST API のラッパー。管理UIから呼ぶ業務APIを薄く整理 | Python / `python-keycloak` / `pydantic-settings` |
 | **Next.js 管理ダッシュボード** | 管理者向けUI。ユーザーCRUD、ロール割り当て、セッション/イベント閲覧 | App Router / Server Components / Server Actions / shadcn/ui |
 | **Next.js SSOサンプルアプリ A** (`:3001`) | デモクライアント A（sienna アクセント、client: `sso-demo`） | next-auth v5 / Keycloak OIDC |

@@ -147,6 +147,39 @@ docker compose ps                 # 6コンテナすべて Up を確認
 
 - `demouser` / `demo` — 事前定義のテストユーザー（ロール: `user`、メール: `demouser@example.com`）
 
+### ログインテーマ
+
+`demo` レルムは `loginTheme: business-demo` を使用しています。管理UI・サンプルアプリと揃えた紙トーン（warm paper + deep ink + sienna アクセント）、Fraunces 見出し + Manrope 本文 + JetBrains Mono ラベルの組み合わせで、ビジネス寄りの落ち着いた外観です。
+
+テーマファイルは `keycloak/themes/business-demo/login/` 以下：
+
+```
+keycloak/themes/business-demo/login/
+├── theme.properties           # parent=keycloak.v2 + styles= 設定
+└── resources/css/custom.css   # 上書きCSS（色・タイポ・フォーム・ボタン）
+```
+
+`docker-compose.yml` の Keycloak サービスに `./keycloak/themes/business-demo:/opt/keycloak/themes/business-demo:ro` としてマウントされており、`start-dev` モードではテーマキャッシュが無効なので、CSSの変更はコンテナ再起動で即反映されます。
+
+既にボリュームが存在する状態（＝realmがimport済み）でテーマを適用する場合は、以下のいずれか：
+
+- **新規起動**: `docker compose down -v && docker compose up -d`（postgresのデータを破棄）
+- **既存realmに反映**: Keycloak Admin REST APIで `loginTheme` を書き換え
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:8080/realms/master/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin&password=admin&grant_type=password&client_id=admin-cli" \
+  | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
+
+curl -X PUT http://localhost:8080/admin/realms/demo \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"loginTheme":"business-demo","internationalizationEnabled":true,"supportedLocales":["ja","en"],"defaultLocale":"ja"}'
+```
+
+反映後、`http://localhost:3001` などから「SSOでログイン」を押せば新しいテーマのログイン画面が表示されます。
+
 ## FastAPI エンドポイント
 
 Keycloak Admin REST API を `python-keycloak` 経由でラップしています。接続先は `docker-compose.yml` の `fastapi.environment` で指定（`KC_*` 環境変数、`pydantic-settings` で読み込み）。

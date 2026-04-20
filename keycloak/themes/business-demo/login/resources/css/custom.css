@@ -1,0 +1,367 @@
+/* ==========================================================================
+   business-demo · Keycloak login theme
+   管理UI・サンプルアプリと揃えた紙トーン基調のビジネス向けログイン画面。
+   keycloak.v2 (PatternFly 5) を継承し、主要な見た目だけを上書きする方針。
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  --bd-paper: #f7f5f0;
+  --bd-paper-sub: #faf8f3;
+  --bd-card: #ffffff;
+  --bd-ink: #1a1814;
+  --bd-ink-muted: #6b6456;
+  --bd-ink-subtle: #9c9585;
+  --bd-rule: #e3ddd0;
+  --bd-rule-strong: #c9c1ae;
+  --bd-accent: #8b3a2e;          /* sienna */
+  --bd-accent-dark: #6e2e25;
+  --bd-forest: #2a5449;          /* forest */
+  --bd-danger: #7a1f1a;
+}
+
+/* ---------- Page canvas ---------- */
+
+html,
+body,
+body.login-pf,
+.login-pf-page,
+.pf-v5-c-login {
+  background:
+    radial-gradient(ellipse 900px 500px at 85% -10%, rgba(42, 84, 73, 0.05), transparent 55%),
+    radial-gradient(ellipse 700px 500px at 10% 110%, rgba(139, 58, 46, 0.04), transparent 55%),
+    var(--bd-paper) !important;
+  color: var(--bd-ink) !important;
+  font-family: "Manrope", "Hiragino Sans", "Yu Gothic", -apple-system, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keep the login page vertically centered */
+.login-pf body,
+body.login-pf-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Login card ---------- */
+
+.card-pf,
+.pf-v5-c-login__main,
+.pf-v5-c-login-main,
+.login-pf-page .card-pf {
+  background: var(--bd-card) !important;
+  border: 1px solid var(--bd-rule) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 28px 48px -28px rgba(26, 24, 20, 0.22) !important;
+  padding: 48px 40px !important;
+  max-width: 440px !important;
+  margin: 32px auto !important;
+}
+
+/* ---------- Header / brand ---------- */
+
+/* Hide Keycloak's default brand image */
+#kc-header .kc-logo-text,
+.pf-v5-c-login__header img,
+.pf-v5-c-brand {
+  display: none !important;
+}
+
+/* Inject our own wordmark */
+.pf-v5-c-login__header::before,
+#kc-header::before {
+  content: "ID管理";
+  display: block;
+  font-family: "Fraunces", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--bd-ink);
+  text-align: center;
+  padding-top: 24px;
+}
+
+.pf-v5-c-login__header::after,
+#kc-header::after {
+  content: "ADMIN · DEMO";
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--bd-ink-muted);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 0 8px;
+}
+
+/* Thin divider rule under the wordmark */
+.pf-v5-c-login__header {
+  position: relative;
+  text-align: center;
+}
+.pf-v5-c-login__header > * {
+  text-align: center;
+}
+
+/* ---------- Page title ("Sign in", "Register"...) ---------- */
+
+#kc-page-title,
+.pf-v5-c-login__main-header h1,
+.pf-v5-c-title {
+  font-family: "Fraunces", "Hiragino Mincho ProN", serif !important;
+  font-size: 24px !important;
+  font-weight: 500 !important;
+  color: var(--bd-ink) !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 24px !important;
+  text-align: center !important;
+}
+
+.pf-v5-c-login__main-header {
+  padding-bottom: 8px !important;
+}
+
+/* ---------- Form labels ---------- */
+
+.pf-v5-c-form__label,
+.pf-v5-c-form__label-text,
+.login-pf label,
+label {
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.18em !important;
+  color: var(--bd-ink-muted) !important;
+}
+
+/* ---------- Inputs ---------- */
+
+.pf-v5-c-form-control,
+.pf-v5-c-form-control input,
+.login-pf input[type="text"],
+.login-pf input[type="password"],
+.login-pf input[type="email"],
+input.form-control {
+  border: 0 !important;
+  border-bottom: 1px solid var(--bd-rule) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 8px 0 !important;
+  font-size: 14px !important;
+  color: var(--bd-ink) !important;
+  box-shadow: none !important;
+  transition: border-color 200ms ease !important;
+  height: 42px !important;
+}
+
+.pf-v5-c-form-control:focus-within,
+.pf-v5-c-form-control input:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus {
+  border-bottom-color: var(--bd-ink) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.pf-v5-c-form-control::placeholder,
+input::placeholder {
+  color: var(--bd-ink-subtle) !important;
+}
+
+/* ---------- Primary button ---------- */
+
+.pf-v5-c-button.pf-m-primary,
+.btn.btn-primary,
+input[type="submit"],
+#kc-login,
+button.kc-login {
+  background: var(--bd-ink) !important;
+  color: var(--bd-paper) !important;
+  border: 1px solid var(--bd-ink) !important;
+  border-radius: 0 !important;
+  padding: 14px 24px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-family: "Manrope", sans-serif !important;
+  transition: background 200ms ease, border-color 200ms ease, transform 80ms ease !important;
+  width: 100% !important;
+  height: auto !important;
+  cursor: pointer;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+input[type="submit"]:hover,
+#kc-login:hover {
+  background: var(--bd-accent) !important;
+  border-color: var(--bd-accent) !important;
+}
+
+.pf-v5-c-button.pf-m-primary:active,
+input[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Secondary / link buttons ---------- */
+
+.pf-v5-c-button.pf-m-secondary,
+.btn.btn-default {
+  background: transparent !important;
+  color: var(--bd-ink) !important;
+  border: 1px solid var(--bd-rule-strong) !important;
+  border-radius: 0 !important;
+  padding: 12px 20px !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.pf-v5-c-button.pf-m-secondary:hover {
+  background: var(--bd-ink) !important;
+  color: var(--bd-paper) !important;
+  border-color: var(--bd-ink) !important;
+}
+
+/* ---------- Links ---------- */
+
+a,
+.pf-v5-c-button.pf-m-link {
+  color: var(--bd-accent) !important;
+  text-decoration: none !important;
+  font-size: 13px !important;
+  transition: color 150ms ease;
+}
+a:hover,
+.pf-v5-c-button.pf-m-link:hover {
+  color: var(--bd-accent-dark) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Checkbox (remember me) ---------- */
+
+.pf-v5-c-check__label,
+.checkbox label {
+  font-size: 13px !important;
+  color: var(--bd-ink-muted) !important;
+  font-family: "Manrope", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+/* ---------- Alerts / error messages ---------- */
+
+.pf-v5-c-alert,
+.alert,
+.kc-feedback-text,
+#input-error {
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 12px 16px !important;
+  font-size: 13px !important;
+  font-family: "Manrope", sans-serif !important;
+}
+
+.pf-v5-c-alert.pf-m-danger,
+.alert.alert-error,
+.alert-error {
+  border-left: 3px solid var(--bd-danger) !important;
+  background: rgba(122, 31, 26, 0.06) !important;
+  color: var(--bd-danger) !important;
+}
+
+.pf-v5-c-alert.pf-m-warning,
+.alert.alert-warning {
+  border-left: 3px solid #a96400 !important;
+  background: rgba(169, 100, 0, 0.06) !important;
+  color: #7a4700 !important;
+}
+
+.pf-v5-c-alert.pf-m-success,
+.alert.alert-success {
+  border-left: 3px solid var(--bd-forest) !important;
+  background: rgba(42, 84, 73, 0.06) !important;
+  color: var(--bd-forest) !important;
+}
+
+.pf-v5-c-alert.pf-m-info,
+.alert.alert-info {
+  border-left: 3px solid var(--bd-ink) !important;
+  background: rgba(26, 24, 20, 0.04) !important;
+  color: var(--bd-ink) !important;
+}
+
+/* ---------- Login footer (register / forgot password) ---------- */
+
+#kc-info,
+#kc-registration,
+#kc-registration-container,
+.pf-v5-c-login__main-footer,
+.pf-v5-c-login__main-footer-band {
+  font-size: 13px !important;
+  color: var(--bd-ink-muted) !important;
+  padding: 16px 0 0 !important;
+  border-top: 1px solid var(--bd-rule);
+  margin-top: 24px;
+  text-align: center;
+}
+
+#kc-info a,
+#kc-registration a {
+  color: var(--bd-accent) !important;
+  font-weight: 500;
+}
+
+/* ---------- Locale selector ---------- */
+
+#kc-locale,
+.pf-v5-c-login__main-header-desc {
+  font-size: 11px !important;
+  color: var(--bd-ink-subtle) !important;
+}
+
+/* ---------- Social provider buttons (if any in the future) ---------- */
+
+.kc-social-links li a,
+.pf-v5-c-login__main-footer-links-item a {
+  border: 1px solid var(--bd-rule-strong) !important;
+  border-radius: 0 !important;
+  padding: 10px 16px !important;
+  color: var(--bd-ink) !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Password strength / toggles ---------- */
+
+.pf-v5-c-input-group,
+.input-group {
+  border: 0 !important;
+  border-bottom: 1px solid var(--bd-rule) !important;
+  border-radius: 0 !important;
+}
+
+.pf-v5-c-input-group > *,
+.input-group > * {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* ---------- Misc: hide Keycloak default attributions in footer ---------- */
+
+.pf-v5-c-login__main-footer-band-item.login-pf-signup {
+  color: var(--bd-ink-muted);
+}
+
+/* Ensure form spacing looks tidy */
+.form-group,
+.pf-v5-c-form__group {
+  margin-bottom: 20px !important;
+}
