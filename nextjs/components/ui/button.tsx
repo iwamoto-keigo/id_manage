@@ -5,25 +5,29 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-xs font-medium uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-[13px] font-medium transition-[background,color,box-shadow,border] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-ink text-paper hover:bg-sienna",
+          "bg-ink text-white shadow-soft hover:bg-clay hover:shadow-lift",
+        primary:
+          "bg-clay text-white shadow-soft hover:brightness-110 hover:shadow-lift",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-ember text-white shadow-soft hover:brightness-110",
         outline:
-          "border border-ink/30 bg-transparent text-ink hover:border-ink hover:bg-ink hover:text-paper",
+          "border border-line bg-surface text-ink shadow-soft hover:border-line-strong hover:bg-surface-soft",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "text-ink hover:bg-ink/5",
-        link: "text-sienna underline-offset-4 hover:underline",
+          "bg-clay-soft text-clay-ink hover:bg-clay-soft/70",
+        ghost:
+          "text-ink-muted hover:bg-line/40 hover:text-ink",
+        link:
+          "text-clay underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-5",
-        sm: "h-8 px-4 text-[10px]",
-        lg: "h-11 px-8",
+        default: "h-9 px-4",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-10 px-6",
         icon: "h-9 w-9",
       },
     },

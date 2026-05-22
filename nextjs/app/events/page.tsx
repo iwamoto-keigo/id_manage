@@ -1,3 +1,5 @@
+import { AlertCircle, Info } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -28,59 +30,96 @@ export default async function EventsPage() {
     error = err instanceof Error ? err.message : String(err);
   }
 
+  const loginCount = events.filter((e) => e.type.toUpperCase() === "LOGIN").length;
+  const errorCount = events.filter((e) => {
+    const t = e.type.toUpperCase();
+    return t.includes("ERROR") || t.includes("FAIL");
+  }).length;
+  const logoutCount = events.filter((e) =>
+    e.type.toUpperCase().includes("LOGOUT"),
+  ).length;
+
   return (
-    <div className="animate-fade-up space-y-12">
+    <div className="animate-fade-up space-y-8">
+      {/* Header */}
       <header className="space-y-4">
-        <p className="eyebrow">ログイン履歴</p>
         <div className="flex items-end justify-between gap-6">
-          <h1 className="font-display text-4xl leading-[1.05] tracking-[-0.02em] text-ink sm:text-5xl">
-            認証イベント
-          </h1>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            全 {events.length.toString().padStart(3, "0")} 件
-          </span>
+          <div className="space-y-1.5">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-subtle">
+              Activity · Login history
+            </p>
+            <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-ink">
+              ログイン履歴
+            </h1>
+            <p className="max-w-2xl text-[13px] leading-relaxed text-ink-muted">
+              新しい順に並んでいます。取得できる件数と保存有無はKeycloakレルムのイベント設定に依存します。
+            </p>
+          </div>
         </div>
-        <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-          新しい順に並んでいます。取得できる件数と保存有無はKeycloakレルムのイベント設定に依存します。
-        </p>
-        <div className="rule-hr animate-rule-grow" />
+
+        {/* meta row */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Badge variant="muted">
+            合計 <span className="ml-1 text-ink">{events.length}</span>
+          </Badge>
+          <Badge variant="active">
+            ログイン <span className="ml-1">{loginCount}</span>
+          </Badge>
+          <Badge variant="clay">
+            ログアウト <span className="ml-1">{logoutCount}</span>
+          </Badge>
+          <Badge variant="danger">
+            エラー <span className="ml-1">{errorCount}</span>
+          </Badge>
+        </div>
       </header>
 
       {error ? (
-        <div className="border border-destructive/40 bg-destructive/5 p-6">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-destructive">
-            イベントを取得できません
-          </p>
-          <p className="mt-2 font-mono text-[11px] text-muted-foreground">{error}</p>
+        <div className="surface flex items-start gap-3 border-ember/40 bg-ember-soft p-5">
+          <AlertCircle className="mt-0.5 h-4 w-4 text-ember-ink" />
+          <div className="space-y-1">
+            <p className="text-[13px] font-medium text-ember-ink">
+              イベントを取得できません
+            </p>
+            <p className="font-mono text-[11px] text-ember-ink/80">{error}</p>
+          </div>
         </div>
       ) : events.length === 0 ? (
-        <div className="border border-dashed border-rule bg-card/40 px-6 py-24 text-center">
-          <p className="font-display text-2xl text-muted-foreground">
+        <div className="surface flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="grid h-11 w-11 place-items-center rounded-full bg-azure-soft">
+            <Info className="h-5 w-5 text-azure-ink" strokeWidth={1.5} />
+          </div>
+          <p className="mt-4 text-[15px] font-semibold tracking-tight text-ink">
             まだイベントは記録されていません
           </p>
-          <p className="mt-3 max-w-md mx-auto text-[12px] leading-relaxed text-muted-foreground">
-            Keycloak管理コンソールの「Realm settings → Events → User events settings」で
+          <p className="mt-1.5 max-w-md text-[12px] leading-relaxed text-ink-muted">
+            Keycloak管理コンソールの
+            <span className="font-mono text-ink">
+              {" "}
+              Realm settings → Events → User events settings{" "}
+            </span>
+            で
             <span className="mx-1 font-medium text-ink">Save events</span>
             を有効にしてください。
           </p>
         </div>
       ) : (
-        <div className="border border-rule bg-card">
+        <div className="surface overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16 pl-6">#</TableHead>
+                <TableHead className="w-14 pl-5">#</TableHead>
                 <TableHead>日時</TableHead>
                 <TableHead>イベント</TableHead>
                 <TableHead>ユーザー</TableHead>
                 <TableHead>IP</TableHead>
-                <TableHead className="pr-6">クライアント</TableHead>
+                <TableHead className="pr-5">クライアント</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {events.map((event, idx) => (
                 <TableRow key={`${event.time}-${idx}`}>
-                  <TableCell className="pl-6 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <TableCell className="pl-5 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-subtle">
                     {String(idx + 1).padStart(3, "0")}
                   </TableCell>
                   <TableCell className="font-mono text-[11px] text-ink">
@@ -91,22 +130,22 @@ export default async function EventsPage() {
                   </TableCell>
                   <TableCell>
                     {event.userId ? (
-                      <div className="flex flex-col">
-                        <span className="text-sm text-ink">
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-[12px] text-ink">
                           {usernameById.get(event.userId) ?? "不明"}
                         </span>
-                        <span className="font-mono text-[10px] text-muted-foreground">
+                        <span className="font-mono text-[10px] text-ink-subtle">
                           {shortId(event.userId, 10)}
                         </span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-ink-subtle">—</span>
                     )}
                   </TableCell>
-                  <TableCell className="font-mono text-[11px] text-muted-foreground">
+                  <TableCell className="font-mono text-[11px] text-ink-muted">
                     {event.ipAddress ?? "—"}
                   </TableCell>
-                  <TableCell className="pr-6 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <TableCell className="pr-5 font-mono text-[11px] text-ink-muted">
                     {event.clientId ?? "—"}
                   </TableCell>
                 </TableRow>
@@ -128,7 +167,7 @@ function EventBadge({ type }: { type: string }) {
     return <Badge variant="active">{type}</Badge>;
   }
   if (upper.includes("LOGOUT")) {
-    return <Badge variant="sienna">{type}</Badge>;
+    return <Badge variant="clay">{type}</Badge>;
   }
   return <Badge>{type}</Badge>;
 }

@@ -38,25 +38,40 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-3.5 w-3.5" />
+        <Button variant="primary">
+          <Plus className="h-4 w-4" strokeWidth={2.25} />
           新規ユーザー
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <p className="eyebrow">新規登録</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-subtle">
+            Create user
+          </p>
           <DialogTitle>ユーザーを登録</DialogTitle>
           <DialogDescription>
-            Keycloakにユーザーを登録します。パスワードはKeycloak側でハッシュ化されて保存されます。
+            Keycloakにユーザーを登録します。パスワードはハッシュ化されて保存されます。
           </DialogDescription>
         </DialogHeader>
-        <form action={onSubmit} className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Field label="ユーザー名" name="username" required autoComplete="off" />
-            <Field label="メール" name="email" type="email" required autoComplete="off" />
-            <Field label="姓" name="last_name" autoComplete="off" />
-            <Field label="名" name="first_name" autoComplete="off" />
+        <form action={onSubmit} className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="ユーザー名"
+              name="username"
+              required
+              autoComplete="off"
+              placeholder="alice"
+            />
+            <Field
+              label="メール"
+              name="email"
+              type="email"
+              required
+              autoComplete="off"
+              placeholder="alice@example.com"
+            />
+            <Field label="姓" name="last_name" autoComplete="off" placeholder="山田" />
+            <Field label="名" name="first_name" autoComplete="off" placeholder="花子" />
           </div>
           <Field
             label="初期パスワード"
@@ -64,8 +79,9 @@ export function CreateUserDialog() {
             type="password"
             required
             autoComplete="new-password"
+            placeholder="••••••••"
           />
-          <DialogFooter>
+          <DialogFooter className="pt-2">
             <Button
               type="button"
               variant="ghost"
@@ -74,8 +90,8 @@ export function CreateUserDialog() {
             >
               キャンセル
             </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? "登録中…" : "登録"}
+            <Button type="submit" variant="primary" disabled={pending}>
+              {pending ? "登録中…" : "登録する"}
             </Button>
           </DialogFooter>
         </form>
@@ -90,18 +106,20 @@ function Field({
   type = "text",
   required,
   autoComplete,
+  placeholder,
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
   autoComplete?: string;
+  placeholder?: string;
 }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={name}>
         {label}
-        {required && <span className="ml-1 text-sienna">*</span>}
+        {required && <span className="ml-1 text-clay">*</span>}
       </Label>
       <Input
         id={name}
@@ -109,6 +127,7 @@ function Field({
         type={type}
         required={required}
         autoComplete={autoComplete}
+        placeholder={placeholder}
       />
     </div>
   );

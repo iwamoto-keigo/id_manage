@@ -10,12 +10,15 @@ export function Toaster(props: ToasterProps) {
       position="bottom-right"
       toastOptions={{
         style: {
-          background: "hsl(var(--card))",
+          background: "hsl(var(--surface))",
           color: "hsl(var(--ink))",
-          border: "1px solid hsl(var(--rule))",
-          borderRadius: "0",
+          border: "1px solid hsl(var(--line))",
+          borderRadius: "10px",
+          boxShadow:
+            "0 1px 2px hsl(var(--ink) / 0.04), 0 12px 32px -12px hsl(var(--ink) / 0.18)",
           fontFamily: "var(--font-body), sans-serif",
           fontSize: "13px",
+          padding: "12px 14px",
         },
       }}
       {...props}

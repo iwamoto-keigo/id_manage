@@ -1,25 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 
-import { SiteNav } from "@/components/site-nav";
+import { SiteSidebar } from "@/components/site-sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
-const fraunces = Fraunces({
+const sans = Geist({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-body",
 });
 
-const mono = JetBrains_Mono({
+const mono = Geist_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",
@@ -27,7 +20,7 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "ID管理コンソール",
-  description: "Keycloak + FastAPI で動くID管理デモアプリ",
+  description: "Keycloak + FastAPI で動くID管理ダッシュボード",
 };
 
 export default function RootLayout({
@@ -36,19 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="ja"
-      className={`${fraunces.variable} ${manrope.variable} ${mono.variable}`}
-    >
-      <body className="font-sans">
-        <SiteNav />
-        <main className="mx-auto w-full max-w-6xl px-8 py-12">{children}</main>
-        <footer className="mx-auto w-full max-w-6xl px-8 pb-10">
-          <div className="tick-row h-2 w-full" />
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-            ID管理 · Keycloak + FastAPI + Next.js
-          </p>
-        </footer>
+    <html lang="ja" className={`${sans.variable} ${mono.variable}`}>
+      <body className="font-sans antialiased">
+        <div className="flex min-h-screen bg-canvas">
+          <SiteSidebar />
+          <div className="flex flex-1 flex-col">
+            <main className="flex-1 px-10 py-10">
+              <div className="mx-auto w-full max-w-[1180px]">{children}</div>
+            </main>
+          </div>
+        </div>
         <Toaster />
       </body>
     </html>
